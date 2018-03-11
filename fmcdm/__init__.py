@@ -3,7 +3,6 @@ import numpy as np
 class FuzPrefStruct():
     # This is Fuzzy Preference Structure represented as (s, phi)-FPS where automorphism phi is the identity function.
     # s = {0,1, 'inf'}
-    #
     def __init__(self, array, s=0):
 
         if s != 0 or s != 1 or s != 'inf':
@@ -49,13 +48,16 @@ class FuzPrefStruct():
             # max{1 - R(a,b) - R(b, a),0}
             self.Jarray = np.maximum(1 - R - R.T, 0)
 
+
 def solve(alternatives, criteria_rarays, method=1, s=0):
 
-    # check proble size
+    # check problem size
     problem_size = len(alternatives)
     for r in criteria_rarays:
-        if r.shape()[0] != r.shape()[1] != problem_size:
-            return print('Invalid problem dimensions. Check dimensions of R relation or the number of alternatives.')
+        print(r.shape)
+        if r.shape[0] != problem_size or r.shape[1] != problem_size:
+            print('Invalid problem dimensions. Check dimensions of R relations or the number of alternatives.')
+            return {'optimal_set': [], 'nd_set': [], 'set_type': None}
 
     fps_list = []
     for r in criteria_rarays:
