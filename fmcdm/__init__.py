@@ -1,6 +1,6 @@
 import numpy as np
 
-class FPS():
+class FuzPrefStruct():
     # This is Fuzzy Preference Structure represented as (s, phi)-FPS where automorphism phi is the identity function.
     # s = {0,1, 'inf'}
     #
@@ -49,12 +49,17 @@ class FPS():
             # max{1 - R(a,b) - R(b, a),0}
             self.Jarray = np.maximum(1 - R - R.T, 0)
 
-def mcdm(alternatives, criteria_rarays, method=1, s=0):
+def solve(alternatives, criteria_rarays, method=1, s=0):
 
+    # check proble size
     problem_size = len(alternatives)
+    for r in criteria_rarays:
+        if r.shape()[0] != r.shape()[1] != problem_size:
+            return print('Invalid problem dimensions. Check dimensions of R relation or the number of alternatives.')
+
     fps_list = []
     for r in criteria_rarays:
-        fps_list.append(FPS(r,s))
+        fps_list.append(FuzPrefStruct(r, s))
 
     if method == 1:
         # aggregation
@@ -62,7 +67,7 @@ def mcdm(alternatives, criteria_rarays, method=1, s=0):
         for r in [fps.Rarray for fps in fps_list]:
             minR = np.minimum(minR, r)
 
-        discrete_fps = FPS(minR, s)
+        discrete_fps = FuzPrefStruct(minR, s)
 
         # scoring
         ND = 1 - np.nanmax(discrete_fps.Parray, axis=0)
@@ -84,7 +89,7 @@ def mcdm(alternatives, criteria_rarays, method=1, s=0):
     elif method == 2:
         # scoring
         ND_list = []
-        for Pk in [fps.Parray for fps in fps_list]:
+        for Pk in [ps.Parray for ps in fps_list]:
             NDk = 1 - np.nanmax(Pk, axis=0)
             ND_list.append(NDk)
 
